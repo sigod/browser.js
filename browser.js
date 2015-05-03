@@ -67,7 +67,9 @@
 	}
 
 	browserjs._define = function (id, func) {
-		cache[id].func = deferred(invokeModule, id, func);
+		cache[id].func = function () {
+			return invokeModule(id, func);
+		};
 	};
 
 	// ---------------------------------------------------------------------------------------------------------------------
@@ -193,14 +195,6 @@
 		}
 
 		return path.join('/');
-	}
-
-	function deferred(func) {
-		var args = Array.prototype.slice.call(arguments, 1);
-
-		return function () {
-			return func.apply(func, args);
-		};
 	}
 
 	function NCall(number, callback) {
