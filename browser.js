@@ -117,12 +117,11 @@
 				return callback();
 			}
 
-			var script = document.createElement('script');
-			script.text = ''
-				+ 'require._define("' + id + '", function (exports, module) {'
-				+ response.content
-				+ '});';
-			document.head.appendChild(script);
+			var body = 'require._define("' + id + '",function(exports,module){' + response.content + '});';
+
+			/* jshint evil: true */
+			new Function('', body)();
+			/* jshint evil: false */
 
 			processModule(id, response.content, callback);
 		});
