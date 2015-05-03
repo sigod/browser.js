@@ -11,7 +11,7 @@
 	window.browserjs = browserjs;
 
 	var __path = '/';
-	var cache = {};
+	var __cache = {};
 
 	// ---------------------------------------------------------------------------------------------------------------------
 
@@ -45,18 +45,14 @@
 
 	function require(module_path) {
 		var id = getId(__path, module_path);
-		var cached = cache[id];
 
-		if (!cached) {
-			loadModule(id, false, function () {});
-			cached = cache[id];
-		}
+		if (!__cache[id]) loadModule(id, false, function () {});
 
 		return getExports(id);
 	}
 
 	function getExports(id) {
-		var module = cache[id];
+		var module = __cache[id];
 
 		if (module.error) throw new Error("Cannot find module '" + module.id + "'");
 
@@ -64,7 +60,7 @@
 			var func = module.func;
 			delete module.func;
 
-			cache[id] = {
+			__cache[id] = {
 				id: id,
 				exports: func(module)
 			};
@@ -74,7 +70,7 @@
 	}
 
 	browserjs._define = function (id, func) {
-		cache[id].func = function (module) {
+		__cache[id].func = function (module) {
 			return invokeModule(id, func, module);
 		};
 	};
@@ -99,7 +95,7 @@
 			.forEach(function (module) {
 				var resolved = getId(path, module);
 
-				if (!cache[resolved]) modules.push(resolved);
+				if (!__cache[resolved]) modules.push(resolved);
 			});
 
 		if (modules.length) {
@@ -132,7 +128,7 @@
 	}
 
 	function loadModule(id, async, callback) {
-		var module = cache[id] = { id: id };
+		var module = __cache[id] = { id: id };
 
 		load(id, async, function (response) {
 			if (response.error) {
