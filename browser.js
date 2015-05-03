@@ -8,7 +8,6 @@
 
 	// ---------------------------------------------------------------------------------------------------------------------
 
-	window.require = require;
 	window.browserjs = browserjs;
 
 	var __path = '/';
@@ -67,7 +66,7 @@
 		return module.exports;
 	}
 
-	require._define = function (id, func) {
+	browserjs._define = function (id, func) {
 		cache[id].func = deferred(invokeModule, id, func);
 	};
 
@@ -78,7 +77,7 @@
 
 		var old_path = __path;
 		__path = path;
-		module.call(pmodule.exports, pmodule.exports, pmodule);
+		module.call(pmodule.exports, require, pmodule.exports, pmodule);
 		__path = old_path;
 
 		return pmodule.exports;
@@ -128,7 +127,7 @@
 				return callback();
 			}
 
-			var body = 'require._define("' + id + '",function(exports,module){' + response.content + '});';
+			var body = 'browserjs._define("' + id + '",function(require,exports,module){' + response.content + '});';
 
 			/* jshint evil: true */
 			new Function('', body)();
