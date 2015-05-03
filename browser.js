@@ -82,8 +82,17 @@
 
 		var old_path = __path;
 		__path = path;
-		func.call(module.exports, require, module.exports, module);
-		__path = old_path;
+
+		var old_main = require.main;
+		require.main = module;
+
+		try {
+			func.call(module.exports, require, module.exports, module);
+		}
+		finally {
+			__path = old_path;
+			require.main = old_main;
+		}
 
 		return module.exports;
 	}
