@@ -9,27 +9,38 @@
 	// ---------------------------------------------------------------------------------------------------------------------
 
 	window.require = require;
+	window.browserjs = browserjs;
 
 	var __path = '/';
 	var cache = {};
 
-	var tag = document.getElementById('browserjs');
-	if (!tag) throw new Error('Cannot find browserjs tag');
+	// ---------------------------------------------------------------------------------------------------------------------
 
-	var base = tag.getAttribute('data-base-url');
-	if (base) {
-		if (base[base.length - 1] !== '/') base += '/';
-		__path = base;
+	var tag = document.getElementById('browserjs');
+	if (tag) {
+		var base = tag.getAttribute('data-base-url');
+		if (base) {
+			if (base[base.length - 1] !== '/') base += '/';
+			__path = base;
+		}
+
+		var main = tag.getAttribute('data-main');
+		if (main) {
+			main = getId(__path, main);
+
+			loadModule(main, true, function () {
+				getModule(cache[main]);
+			});
+		}
 	}
 
-	var main = tag.getAttribute('data-main');
-	if (!main) throw new Error('data-main attribute is required');
+	// ---------------------------------------------------------------------------------------------------------------------
 
-	main = getId(__path, main);
-
-	loadModule(main, true, function () {
-		getModule(cache[main]);
-	});
+	function browserjs(func) {
+		processModule(__path, func, function () {
+			invokeModule(__path, func);
+		});
+	}
 
 	// ---------------------------------------------------------------------------------------------------------------------
 
