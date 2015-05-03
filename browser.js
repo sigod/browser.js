@@ -28,7 +28,7 @@
 			main = getId(__path, main);
 
 			loadModule(main, true, function () {
-				getExports(cache[main]);
+				getExports(main);
 			});
 		}
 	}
@@ -37,7 +37,7 @@
 
 	function browserjs(func) {
 		processModule(__path, func.toString(), function () {
-			invokeModule(__path, func);
+			invokeModule(__path, func, {});
 		});
 	}
 
@@ -52,37 +52,44 @@
 			cached = cache[id];
 		}
 
-		return getExports(cached);
+		return getExports(id);
 	}
 
-	function getExports(module) {
+	function getExports(id) {
+		var module = cache[id];
+
 		if (module.error) throw new Error("Cannot find module '" + module.id + "'");
 
 		if (module.func) {
-			module.exports = module.func();
+			var func = module.func;
 			delete module.func;
+
+			cache[id] = {
+				id: id,
+				exports: func(module)
+			};
 		}
 
 		return module.exports;
 	}
 
 	browserjs._define = function (id, func) {
-		cache[id].func = function () {
-			return invokeModule(id, func);
+		cache[id].func = function (module) {
+			return invokeModule(id, func, module);
 		};
 	};
 
 	// ---------------------------------------------------------------------------------------------------------------------
 
-	function invokeModule(path, module) {
-		var pmodule = { exports: {} };
+	function invokeModule(path, func, module) {
+		module.exports = {};
 
 		var old_path = __path;
 		__path = path;
-		module.call(pmodule.exports, require, pmodule.exports, pmodule);
+		func.call(module.exports, require, module.exports, module);
 		__path = old_path;
 
-		return pmodule.exports;
+		return module.exports;
 	}
 
 	function processModule(path, content, callback) {
