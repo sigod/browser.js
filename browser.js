@@ -169,7 +169,7 @@
 	}
 
 	function normalize(path) {
-		var path = path.split('/');
+		path = path.split('/');
 
 		for (var i = 1; i < path.length; ++i) {
 			if (path[i] === '' || path[i] === '.') {
