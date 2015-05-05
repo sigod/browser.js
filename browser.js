@@ -10,7 +10,8 @@
 
 	window.browserjs = browserjs;
 
-	var __path = '/';
+	var __path = '';
+	var __global = '/';
 	var __cache = {};
 
 	// ---------------------------------------------------------------------------------------------------------------------
@@ -20,7 +21,7 @@
 		var base = tag.getAttribute('data-base-url');
 		if (base) {
 			if (base[base.length - 1] !== '/') base += '/';
-			__path = base;
+			__global = base;
 		}
 
 		var main = tag.getAttribute('data-main');
@@ -145,10 +146,11 @@
 		}
 	}
 
+	// 3
 	function loadModule(id, async, callback) {
 		var module = __cache[id] = { id: id };
 
-		load(id, async, function (response) {
+		load(__global + id, async, function (response) {
 			if (response.error) {
 				module.error = response.error;
 				return callback();
@@ -189,23 +191,27 @@
 		return id;
 	}
 
+	// 1
 	function folder(path) {
 		return path.substr(0, path.lastIndexOf('/') + 1);
 	}
 
+	// 1
 	function extension(path) {
 		var index = path.lastIndexOf('.');
 		if (index !== -1) return path.substring(index);
 	}
 
+	// 1
 	function buildPath() {
 		return normalize(Array.prototype.join.call(arguments, '/'));
 	}
 
+	// 1
 	function normalize(path) {
 		path = path.split('/');
 
-		for (var i = 1; i < path.length; ++i) {
+		for (var i = 0; i < path.length; ++i) {
 			if (path[i] === '' || path[i] === '.') {
 				path.splice(i, 1);
 				--i;
