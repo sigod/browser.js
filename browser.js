@@ -128,12 +128,21 @@
 		while (index >= 0) {
 			var index2 = content.indexOf(')', index);
 
-			result.push(content.substring(index + require_begin_str.length + 1, index2 - 1));
+			var key = content.substring(index + require_begin_str.length, index2).trim();
+
+			if (key.length && key[0] === key[key.length - 1] && isStringMark(key[0])) {
+				result.push(key.substring(1, key.length - 1));
+			}
 
 			index = content.indexOf(require_begin_str, index2);
 		}
 
 		return result;
+
+
+		function isStringMark(char) {
+			return char === "'" || char === '"';
+		}
 	}
 
 	function loadModule(id, async, callback) {
